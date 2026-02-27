@@ -88,12 +88,12 @@ client.MessageService.MessageReceived += async (message) =>
         await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»\n{pokedexOutput}");
     }
 
-    // if (Utils.StartsWithAny(content, "v/pokemon move", "v/pkmn move"))
-    // {
-    //     string moveName = string.Join(" ", split[2..]);
-    //     string pokemoveOutput = await Pkmn.Pkmn.movedexEntry(abilityName);
-    //     await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»\n{pokemoveyOutput}");
-    // }
+    if (Utils.StartsWithAny(content, "v/pokemon move", "v/pkmn move"))
+    {
+        string moveName = string.Join(" ", split[2..]);
+        string pokemoveOutput = await Pkmn.Pkmn.movedexEntry(moveName);
+        await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»\n{pokemoveOutput}");
+    }
 
     // if (Utils.StartsWithAny(content, "v/sayhitovictor"))
     // {

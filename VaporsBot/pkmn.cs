@@ -181,7 +181,72 @@ namespace Pkmn {
             }
 
             return null;
-        }        
+        }
+
+        private static async Task<String> movedexEntry(JsonElement move)
+        {
+            int num = move.GetProperty("num").GetInt32();
+            string name = move.GetProperty("name").GetString();
+            string accuracy = move.GetProperty("accuracy").GetRawText();
+            int basePower = move.GetProperty("basePower").GetInt16();
+            string category = move.GetProperty("category").GetString();
+            int critRatio = 1;
+            if (move.TryGetProperty("critRatio", out var critRatioTry))
+            {
+                critRatio = critRatioTry.GetInt16();
+            }
+            int priority = 0;
+            string priorityPrefix = "";
+            if (move.TryGetProperty("critRatio", out var priorityTry))
+            {
+                priority = priorityTry.GetInt16();
+                if (priority > 0) priorityPrefix = "+";
+            }
+            int pp = move.GetProperty("pp").GetInt16();
+            string type = move.GetProperty("type").GetString();
+            string target = move.GetProperty("target").GetString();
+            string desc = move.GetProperty("desc").GetString();
+
+            string output = $"{name}";
+            output += $"\nPower: {basePower}, Accuracy: {accuracy}, Type: {type}";
+            output += $"\nStat: {category}, PP: {pp}";
+            output += $"\nTargets: {target}";
+            output += $"\nCrit Ratio: {critRatio}, Priority: {priorityPrefix}{priority}";
+            output += $"\n\n{desc}";
+            
+            return output;
+        }
+
+        public static async Task<string?> movedexEntry(string movedexName)
+        {
+            JsonElement data = await requestMovedex();
+            movedexName = movedexName.ToLower();
+
+            // by name
+            foreach (JsonProperty property in data.EnumerateObject())
+            {
+                string key = property.Name;
+                JsonElement value = property.Value;
+
+                if (key == movedexName)
+                {
+                    return await movedexEntry(value);
+                }
+            }
+
+            // by natdex
+            foreach (JsonProperty property in data.EnumerateObject()) {
+                string key = property.Name;
+                JsonElement value = property.Value;
+
+                if (value.GetProperty("num").GetInt32().ToString() == movedexName)
+                {
+                    return await movedexEntry(value);
+                }
+            }
+
+            return null;
+        }
 
         public static List<string> GetStringList(JsonElement element)
         {
