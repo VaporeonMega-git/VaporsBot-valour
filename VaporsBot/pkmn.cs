@@ -208,11 +208,11 @@ namespace Pkmn {
             string desc = move.GetProperty("desc").GetString();
 
             string output = $"{name}";
-            output += $"\nPower: {basePower}, Accuracy: {accuracy}, Type: {type}";
-            output += $"\nStat: {category}, PP: {pp}";
-            output += $"\nTargets: {target}";
-            output += $"\nCrit Ratio: {critRatio}, Priority: {priorityPrefix}{priority}";
-            output += $"\n\n{desc}";
+            output += $"\nType: `{type}`";
+            output += $"\nPower: `{basePower}`, Accuracy: `{accuracy}`";
+            output += $"\nStat: `{category}`, PP: `{pp}`";
+            output += $"\nTargets: `{target}`, Crit Ratio: `{critRatio}`, Priority: `{priorityPrefix}{priority}`";
+            output += $"\n```text\n{desc}\n```";
             
             return output;
         }
