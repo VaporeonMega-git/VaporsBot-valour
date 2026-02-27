@@ -59,7 +59,7 @@ namespace Pkmn {
             }
         }
 
-        private static async Task<String> pokedexEntry(JsonElement pokemon, JsonElement learnset)
+        private static async Task<String> pokedexEntry(JsonElement pokemon, JsonElement? learnset)
         {
             int gen = 9;
 
@@ -84,25 +84,27 @@ namespace Pkmn {
             double weightkg = pokemon.GetProperty("weightkg").GetDouble();
 
             List<string> moves = [];
-            while (moves.Count == 0 && gen > 0) {
-                foreach (JsonProperty property in learnset.EnumerateObject())
-                {
-                    string moveName = property.Name;
-                    JsonElement moveList = property.Value;
-
-                    bool currentGen = false;
-                    foreach (string learnMethod in GetStringList(moveList))
+            if (learnset != null) {
+                while (moves.Count == 0 && gen > 0) {
+                    foreach (JsonProperty property in ((JsonElement) learnset).EnumerateObject())
                     {
-                        if (learnMethod.StartsWith(gen.ToString())) currentGen = true;
+                        string moveName = property.Name;
+                        JsonElement moveList = property.Value;
+
+                        bool currentGen = false;
+                        foreach (string learnMethod in GetStringList(moveList))
+                        {
+                            if (learnMethod.StartsWith(gen.ToString())) currentGen = true;
+                        }
+
+                        if (currentGen) moves.Add(moveName);
                     }
 
-                    if (currentGen) moves.Add(moveName);
+                    gen -= 1;
                 }
 
-                gen -= 1;
+                gen += 1;
             }
-
-            gen += 1;
 
             string output = $"{name} #{natdex}";
             if (types.Count == 1) {
@@ -131,7 +133,7 @@ namespace Pkmn {
                 output += $"\nGen {gen} Learnset: ";
                 foreach (string move in moves)
                 {
-                    output += move + ", ";
+                    output += $"`{move}`, ";
                 }
                 output = output.Substring(0, output.Length - 2);
             }
@@ -153,7 +155,12 @@ namespace Pkmn {
 
                 if (key == pokemonName)
                 {
-                    return await pokedexEntry(value, learnsets.GetProperty(key).GetProperty("learnset"));
+                    if (learnsets.TryGetProperty(key, out var learnset)){
+                        return await pokedexEntry(value, learnsets.GetProperty(key).GetProperty("learnset"));
+                    } else
+                    {
+                        return await pokedexEntry(value, null);
+                    }
                 }
             }
 
@@ -164,7 +171,12 @@ namespace Pkmn {
 
                 if (value.GetProperty("num").GetInt32().ToString() == pokemonName)
                 {
-                    return await pokedexEntry(value, learnsets.GetProperty(key));
+                    if (learnsets.TryGetProperty(key, out var learnset)){
+                        return await pokedexEntry(value, learnsets.GetProperty(key));
+                    } else
+                    {
+                        return await pokedexEntry(value, null);
+                    }
                 }
             }
 

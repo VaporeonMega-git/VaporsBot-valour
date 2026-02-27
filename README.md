@@ -23,7 +23,7 @@ VaporsBot is a Valour.gg bot.
     <li>Channel IDs</li>
 </ul>
 
-<p>SkyBot does <strong>not</strong> store:</p>
+<p>VaporsBot does <strong>not</strong> store:</p>
 <ul>
     <li>Message content</li>
     <li>Direct messages</li>
