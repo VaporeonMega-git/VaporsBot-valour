@@ -99,6 +99,13 @@ client.MessageService.MessageReceived += async (message) =>
     // {
     //     await Utils.SendReplyAsync(channelCache, channelId, $"clanker/meow/bot/native/roadmap");
     // }
+
+    if (Utils.StartsWithAny(content, "v/echo "))
+    {
+        if (message.AuthorUserId != client.Me.OwnerId) return;
+        string msg = string.Join(" ", split[1..]);
+        await Utils.SendReplyAsync(channelCache, channelId, $"{msg}");
+    }
 };
 
 Console.WriteLine("Listening for messages...");
