@@ -1,4 +1,6 @@
 using System.Globalization;
+using Microsoft.VisualBasic;
+using Valour.Sdk.Client;
 using Valour.Sdk.Models;
 
 namespace VaporsBot

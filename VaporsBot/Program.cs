@@ -3,6 +3,7 @@ using Valour.Sdk.Models;
 using DotNetEnv;
 using VaporsBot;
 using Pkmn;
+using Valour.Shared;
 
 Env.Load();
 
@@ -30,16 +31,22 @@ if (!loginResult.Success)
 
 var channelCache = new Dictionary<long, Channel>();
 
-await client.BotService.JoinAllChannelsAsync();
+async Task joinChannels() { 
+    await client.BotService.JoinAllChannelsAsync();
 
-foreach (var planet in client.PlanetService.JoinedPlanets)
-{
-    foreach (var channel in planet.Channels)
+    // channelCache = new Dictionary<long, Channel>();
+
+    foreach (var planet in client.PlanetService.JoinedPlanets)
     {
-        channelCache[channel.Id] = channel;
-        Console.WriteLine($"Cached: {channel.Id}");
+        foreach (var channel in planet.Channels)
+        {
+            channelCache[channel.Id] = channel;
+            Console.WriteLine($"Cached: {channel.Id}");
+        }
     }
 }
+
+await joinChannels();
 
 Console.WriteLine($"Logged in as {client.Me.Name} (ID: {client.Me.Id})");
 
@@ -105,6 +112,61 @@ client.MessageService.MessageReceived += async (message) =>
         if (message.AuthorUserId != client.Me.OwnerId) return;
         string msg = string.Join(" ", split[1..]);
         await Utils.SendReplyAsync(channelCache, channelId, $"{msg}");
+    }
+
+    if (Utils.StartsWithAny(content, "v/join "))
+    {
+        if (message.AuthorUserId != client.Me.OwnerId) return;
+        if (!long.TryParse(split[1], out var planetIdToJoin))
+        {
+            await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» v/join [planetId] [optional inviteCode]");
+            return;
+        }
+        if (split.Length < 2)
+        {
+            bool joinResult = (await client.PlanetService.JoinPlanetAsync(planetIdToJoin)).Success.ToString().ToLower().Equals("true");
+            await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» {(joinResult ? "Joined planet" : "Failed to join planet")}");
+
+            await joinChannels();
+        } else
+        {
+            string inviteCode = split[2];
+            bool joinResult = (await client.PlanetService.JoinPlanetAsync(planetIdToJoin, inviteCode)).Success.ToString().ToLower().Equals("true");
+            await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» {(joinResult ? $"Joined planet {(await client.PlanetService.FetchPlanetAsync(planetIdToJoin)).Name}" : "Failed to join planet")}");
+
+            await joinChannels();
+        }
+    }
+
+    if (Utils.StartsWithAny(content, "v/leave "))
+    {
+        if (message.AuthorUserId != client.Me.OwnerId) return;
+        if (!long.TryParse(split[1], out var planetIdToLeave))
+        {
+            await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» v/leave [planetId]");
+            return;
+        }
+        Planet planetToLeave;
+        try {
+            planetToLeave = await client.PlanetService.FetchPlanetAsync(planetIdToLeave);
+        } catch (Exception exception)
+        {
+            await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» Not a member of that planet!");
+            return;
+        }
+        bool leaveResult = (await client.PlanetService.LeavePlanetAsync(planetToLeave)).Success.ToString().ToLower().Equals("true");
+        await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» {(leaveResult ? $"Left planet {planetToLeave.Name}" : "Failed to leave planet")}");
+
+        await joinChannels();
+    }
+
+    if (Utils.StartsWithAny(content, "v/refreshchannels"))
+    {
+        if (message.AuthorUserId != client.Me.OwnerId) return;
+
+        await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» Refreshing channels...");
+        
+        await joinChannels();
     }
 };
 
