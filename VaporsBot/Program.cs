@@ -87,6 +87,11 @@ client.MessageService.MessageReceived += async (message) =>
         // };
     }
 
+    if (Utils.StartsWithAny(content, "v/help", "v/cmd", "v/list"))
+    {
+        await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» My commands:\n- `v/source|src` - links to my source code\n- `v/pokemon|pkmn - fetch information about pokemon`\n- `v/cat` - show a random image of a cat");
+    }
+
     if (Utils.StartsWithAny(content, "v/source", "v/src"))
     {
         await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» You can see my source code here: https://github.com/VaporeonMega-git/VaporsBot-valour");
