@@ -142,7 +142,8 @@ client.MessageService.MessageReceived += async (message) =>
         JsonElement randomCatData = JsonSerializer.Deserialize<JsonElement>(randomCatJson);
         string randomCatUrl = randomCatData.GetProperty("url").GetString();
 
-        await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»^^^^^^^^^^^^^^{randomCatUrl}^^^^^^^^^^^^^^");
+        // await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»^^^^^^^^^^^^^^{randomCatUrl}^^^^^^^^^^^^^^");
+        await Utils.SendReplyAsync(channelCache, channelId, $"[{randomCatUrl}]()«@m-{member.Id}»");
 
         // byte[] imageBytes = await httpClient.GetByteArrayAsync(randomCatUrl);
 
