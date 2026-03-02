@@ -81,5 +81,17 @@ namespace VaporsBot
                 Console.WriteLine($"Channel {channel} was not found in the cache.");
             };
         }
+
+        public static async Task SendReplyFileAsync(Dictionary<long, Channel> channelCache, long channel, string reply, List<MessageAttachment> attachments)
+        {
+            if (channelCache.TryGetValue(channel, out var chan))
+            {
+                await chan.SendMessageAsync(reply, attachments);
+            }
+            else
+            {
+                Console.WriteLine($"Channel {channel} was not found in the cache.");
+            };
+        }
     };
 };

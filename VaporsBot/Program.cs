@@ -4,6 +4,10 @@ using DotNetEnv;
 using VaporsBot;
 using Pkmn;
 using Valour.Shared;
+using System.Text.Json;
+using Valour.Shared.Models;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 Env.Load();
 
@@ -88,23 +92,75 @@ client.MessageService.MessageReceived += async (message) =>
         await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» You can see my source code here: https://github.com/VaporeonMega-git/VaporsBot-valour");
     }
 
-    if (Utils.StartsWithAny(content, "v/pokemon pokedex", "v/pkmn pokedex"))
+    if (Utils.StartsWithAny(content, "v/pokemon", "v/pkmn"))
     {
-        string pkmnName = string.Join(" ", split[2..]);
-        string pokedexOutput = await Pkmn.Pkmn.pokedexEntry(pkmnName);
-        await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»\n{pokedexOutput}");
+
+        if (Utils.StartsWithAny(content, "v/pokemon pokedex", "v/pkmn pokedex"))
+        {
+            if (split.Length <= 2)
+            {
+                await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» Usage: `v/pokemon pokedex <species|natdex#>`");
+                return;
+            }
+
+            string pkmnName = string.Join(" ", split[2..]);
+            string pokedexOutput = await Pkmn.Pkmn.pokedexEntry(pkmnName);
+            await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»\n{pokedexOutput}");
+        }
+        
+        else if (Utils.StartsWithAny(content, "v/pokemon move", "v/pkmn move"))
+        {
+            if (split.Length <= 2)
+            {
+                await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» Usage: `v/pokemon move <move>`");
+                return;
+            }
+
+            string moveName = string.Join(" ", split[2..]);
+            string pokemoveOutput = await Pkmn.Pkmn.movedexEntry(moveName);
+            await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»\n{pokemoveOutput}");
+        }
+
+        else
+        {
+            await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» Unknown sub-command. Valid sub-commands are:\n- `v/pokemon pokedex <species|natdex#>`\n- `v/pokemon move <name>`");
+        }
+
     }
 
-    if (Utils.StartsWithAny(content, "v/pokemon move", "v/pkmn move"))
+    if (Utils.StartsWithAny(content, "v/cat"))
     {
-        string moveName = string.Join(" ", split[2..]);
-        string pokemoveOutput = await Pkmn.Pkmn.movedexEntry(moveName);
-        await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»\n{pokemoveOutput}");
+        using HttpClient httpClient = new();
+
+        // string randomCat = await httpClient.GetStringAsync("https://aleatori.cat/random");
+        string randomCatJson = await httpClient.GetStringAsync("https://aleatori.cat/random.json");
+        JsonElement randomCatData = JsonSerializer.Deserialize<JsonElement>(randomCatJson);
+        string randomCatUrl = randomCatData.GetProperty("url").GetString();
+
+        await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»^^^^^^^^^^^^^^{randomCatUrl}^^^^^^^^^^^^^^");
+
+        // byte[] imageBytes = await httpClient.GetByteArrayAsync(randomCatUrl);
+
+        // using Image image = Image.Load(imageBytes);
+        // int width = image.Width;
+        // int height = image.Height;
+
+        // MessageAttachment ma = new(MessageAttachmentType.Image)
+        // {
+        //     Local = false,
+        //     Location = randomCatUrl,
+        //     MimeType = "image/jpeg",
+        //     FileName = "cat",
+        //     Height = height,
+        //     Width = width,
+        // };
+
+        // await Utils.SendReplyFileAsync(channelCache, channelId, $"«@m-{member.Id}»", [ma]);
     }
 
     // if (Utils.StartsWithAny(content, "v/sayhitovictor"))
     // {
-    //     await Utils.SendReplyAsync(channelCache, channelId, $"clanker/meow/bot/native/roadmap");
+    //     await Utils.SendReplyAsync(channelCache, channelId, $"clanker/meow/bot/native/roadmap/bug/github");
     // }
 
     if (Utils.StartsWithAny(content, "v/echo "))
