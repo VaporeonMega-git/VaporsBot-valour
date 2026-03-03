@@ -109,7 +109,8 @@ client.MessageService.MessageReceived += async (message) =>
             }
 
             string pkmnName = string.Join(" ", split[2..]);
-            string pokedexOutput = await Pkmn.Pkmn.pokedexEntry(pkmnName);
+            // string pokedexOutput = await Pkmn.Pkmn.pokedexEntry(pkmnName);
+            string pokedexOutput = await Pkmn.Pkmn.GetPokedexEntrySummary(pkmnName);
             await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»\n{pokedexOutput}");
         }
         
@@ -122,8 +123,23 @@ client.MessageService.MessageReceived += async (message) =>
             }
 
             string moveName = string.Join(" ", split[2..]);
-            string pokemoveOutput = await Pkmn.Pkmn.movedexEntry(moveName);
+            // string pokemoveOutput = await Pkmn.Pkmn.movedexEntry(moveName);
+            string pokemoveOutput = await Pkmn.Pkmn.GetMoveSummary(moveName);
             await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»\n{pokemoveOutput}");
+        }
+
+        else if (Utils.StartsWithAny(content, "v/pokemon ability", "v/pkmn ability"))
+        {
+            if (split.Length <= 2)
+            {
+                await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}» Usage: `v/pokemon ability <ability>`");
+                return;
+            }
+
+            string abilityName = string.Join(" ", split[2..]);
+            // string pokeabilityOutput = await Pkmn.Pkmn.abilitydexEntry(abilityName);
+            string pokeabilityOutput = await Pkmn.Pkmn.GetAbilitySummary(abilityName);
+            await Utils.SendReplyAsync(channelCache, channelId, $"«@m-{member.Id}»\n{pokeabilityOutput}");
         }
 
         else
