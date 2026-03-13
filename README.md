@@ -16,7 +16,7 @@ VaporsBot is a Valour.gg bot.
 </ul>
 
 <h2>Data &amp; Privacy</h2>
-<p>Grok stores only the minimum data required for operation:</p>
+<p>VaporsBot stores only the minimum data required for operation:</p>
 <ul>
     <li>Message IDs</li>
     <li>Server (Planet) IDs</li>
@@ -59,7 +59,7 @@ available under the same license.
 <h2>Installation</h2>
 Fork this Repository
 <pre><code>git clone the fork
-cd VaporsBot-valour/Grok
+cd VaporsBot-valour/VaporsBot
 dotnet restore
 </code></pre>
 
